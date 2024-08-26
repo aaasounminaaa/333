@@ -1,12 +1,12 @@
 FROM alpine:latest
+
 WORKDIR /app
-RUN apk update && apk add --no-cache \
-    libc6-compat \
-    libstdc++ \
-    libgcc
-RUN apk upgrade --no-cache busybox
 COPY ./token /app/token
-RUN chmod +x /app/token
+RUN apk add --no-cache libc6-compat libstdc++ libgcc openssl && \
+        apk upgrade --no-cache busybox && \
+        chmod +x /app/token && \
+        adduser -D -H -s /bin/sh token
+USER token
 EXPOSE 8080
 
 CMD ["/app/token"]
