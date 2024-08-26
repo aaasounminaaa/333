@@ -1,0 +1,28 @@
+{
+    "metrics": {
+      "metrics_collected": {
+        "mem": {
+          "measurement": [
+            "mem_used_percent"
+          ]
+        }
+      }
+    },
+    "agent": {
+      "run_as_user": "root"
+    },
+    "logs": {
+          "logs_collected": {
+                  "files": {
+                          "collect_list": [
+                                  {
+                                          "file_path": "/home/ec2-user/token.log",
+                                          "log_group_name": "/application/token",
+                                          "log_stream_name": "{instance_id}",
+                                          "retention_in_days": -1
+                                  }
+                          ]
+                  }
+          }
+    }
+  }

@@ -1,0 +1,5 @@
+fields @timestamp, @message
+| filter @message not like "/healthcheck"
+| filter @message not like "[GIN-debug]"
+| filter @message not like "Please"
+| sort @timestamp desc

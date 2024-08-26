@@ -1,0 +1,230 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: token-deployment
+spec:
+  selector:
+    matchLabels:
+      app: token
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: token
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: token
+          image: TOKEN_IMAGE
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "350m"
+            limits:
+              memory: "200Mi"
+              cpu: "500m"
+          startupProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 12
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 6
+            successThreshold: 1
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","sleep 30"]
+        - name: envoy-sidecar
+          image: envoyproxy/envoy:v1.27.7
+          args:
+            - "--config-path"
+            - "/etc/envoy/envoy.yaml"
+          volumeMounts:
+            - name: envoy-config-token-volume
+              mountPath: /etc/envoy
+          resources:
+            requests:
+              memory: "35Mi"
+              cpu: "70m"
+            limits:
+              memory: "70Mi"
+              cpu: "150m"
+          startupProbe:
+            httpGet:
+              path: /healthcheck
+              port: 10000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 12
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 10000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 10000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 6
+            successThreshold: 1
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","sleep 30"]
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: envoy-config-token-volume
+          configMap:
+            name: envoy-token-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employee-deployment
+spec:
+  selector:
+    matchLabels:
+      app: employee
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: employee
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: employee
+          image: EMP_IMAGE
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "350m"
+            limits:
+              memory: "200Mi"
+              cpu: "500m"
+          env:
+           - name: MYSQL_USER
+             value: "admin"
+           - name: MYSQL_PASSWORD
+             value: "Skill53##"
+           - name: MYSQL_HOST
+             value: "RDS_EP"
+           - name: MYSQL_PORT
+             value: "3306"
+           - name: MYSQL_DBNAME
+             value: "dev"
+          startupProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 12
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 6
+            successThreshold: 1
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","sleep 30"]
+        - name: envoy-sidecar
+          image: envoyproxy/envoy:v1.27.7
+          args:
+            - "--config-path"
+            - "/etc/envoy/envoy.yaml"
+          volumeMounts:
+            - name: envoy-config-volume
+              mountPath: /etc/envoy
+          resources:
+            requests:
+              memory: "35Mi"
+              cpu: "70m"
+            limits:
+              memory: "70Mi"
+              cpu: "150m"
+          startupProbe:
+            httpGet:
+              path: /healthcheck
+              port: 10000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 12
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 10000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 10000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 6
+            successThreshold: 1
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","sleep 30"]
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: envoy-config-volume
+          configMap:
+            name: envoy-employee-config

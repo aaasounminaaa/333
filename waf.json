@@ -1,0 +1,257 @@
+{
+  "Name": "token-query-string",
+  "Priority": 0,
+  "Action": {
+    "Block": {
+      "CustomResponse": {
+        "ResponseCode": "403"
+      }
+    }
+  },
+  "VisibilityConfig": {
+    "SampledRequestsEnabled": true,
+    "CloudWatchMetricsEnabled": true,
+    "MetricName": "wsi-waf-cw"
+  },
+  "Statement": {
+    "NotStatement": {
+      "Statement": {
+        "ByteMatchStatement": {
+          "FieldToMatch": {
+            "JsonBody": {
+              "MatchScope": "ALL",
+              "MatchPattern": {
+                "All": {}
+              },
+              "OversizeHandling": "NO_MATCH"
+            }
+          },
+          "PositionalConstraint": "STARTS_WITH",
+          "SearchString": "length",
+          "TextTransformations": [
+            {
+              "Type": "NONE",
+              "Priority": 0
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+###########################
+{
+  "Name": "token-query-string",
+  "Priority": 0,
+  "Action": {
+    "Block": {
+      "CustomResponse": {
+        "ResponseCode": "403"
+      }
+    }
+  },
+  "VisibilityConfig": {
+    "SampledRequestsEnabled": true,
+    "CloudWatchMetricsEnabled": true,
+    "MetricName": "wsi-waf-cw"
+  },
+  "Statement": {
+    "AndStatement": {
+      "Statements": [
+        {
+          "NotStatement": {
+            "Statement": {
+              "ByteMatchStatement": {
+                "FieldToMatch": {
+                  "JsonBody": {
+                    "MatchScope": "KEY",
+                    "MatchPattern": {
+                      "All": {}
+                    },
+                    "OversizeHandling": "NO_MATCH"
+                  }
+                },
+                "PositionalConstraint": "STARTS_WITH",
+                "SearchString": "length",
+                "TextTransformations": [
+                  {
+                    "Type": "NONE",
+                    "Priority": 0
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "NotStatement": {
+            "Statement": {
+              "ByteMatchStatement": {
+                "FieldToMatch": {
+                  "UriPath": {}
+                },
+                "PositionalConstraint": "EXACTLY",
+                "SearchString": "/v1/token",
+                "TextTransformations": [
+                  {
+                    "Type": "NONE",
+                    "Priority": 0
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+#################### path
+{
+  "Name": "healthcheck-and-employee",
+  "Priority": 2,
+  "Action": {
+    "Allow": {}
+  },
+  "VisibilityConfig": {
+    "SampledRequestsEnabled": true,
+    "CloudWatchMetricsEnabled": true,
+    "MetricName": "healthcheck"
+  },
+  "Statement": {
+    "OrStatement": {
+      "Statements": [
+        {
+          "ByteMatchStatement": {
+            "FieldToMatch": {
+              "UriPath": {}
+            },
+            "PositionalConstraint": "EXACTLY",
+            "SearchString": "/v1/employee",
+            "TextTransformations": [
+              {
+                "Type": "NONE",
+                "Priority": 0
+              }
+            ]
+          }
+        },
+        {
+          "ByteMatchStatement": {
+            "FieldToMatch": {
+              "UriPath": {}
+            },
+            "PositionalConstraint": "EXACTLY",
+            "SearchString": "/healthcheck",
+            "TextTransformations": [
+              {
+                "Type": "NONE",
+                "Priority": 0
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+
+{
+  "Name": "path-acl",
+  "Priority": 0,
+  "Action": {
+    "Allow": {}
+  },
+  "VisibilityConfig": {
+    "SampledRequestsEnabled": true,
+    "CloudWatchMetricsEnabled": true,
+    "MetricName": "path-acl"
+  },
+  "Rules": [
+    {
+      "Name": "AllowTokenPath",
+      "Priority": 1,
+      "Action": {
+        "Allow": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "AllowTokenPath"
+      },
+      "Statement": {
+        "ByteMatchStatement": {
+          "SearchString": "/v1/token",
+          "FieldToMatch": {
+            "UriPath": {}
+          },
+          "PositionalConstraint": "EXACTLY",
+          "TextTransformations": [
+            {
+              "Type": "NONE",
+              "Priority": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "Name": "AllowHealthCheckPath",
+      "Priority": 2,
+      "Action": {
+        "Allow": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "AllowHealthCheckPath"
+      },
+      "Statement": {
+        "ByteMatchStatement": {
+          "SearchString": "/v1/healthcheck",
+          "FieldToMatch": {
+            "UriPath": {}
+          },
+          "PositionalConstraint": "EXACTLY",
+          "TextTransformations": [
+            {
+              "Type": "NONE",
+              "Priority": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "Name": "AllowEmployeePath",
+      "Priority": 3,
+      "Action": {
+        "Allow": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "AllowEmployeePath"
+      },
+      "Statement": {
+        "ByteMatchStatement": {
+          "SearchString": "/v1/employee",
+          "FieldToMatch": {
+            "UriPath": {}
+          },
+          "PositionalConstraint": "EXACTLY",
+          "TextTransformations": [
+            {
+              "Type": "NONE",
+              "Priority": 0
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
